@@ -6,7 +6,6 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -30,22 +29,55 @@
         label="ID">
       </el-table-column>
       <el-table-column
-        prop="paramKey"
+        prop="user.name"
         header-align="center"
         align="center"
-        label="参数名">
+        label="姓名">
       </el-table-column>
       <el-table-column
-        prop="paramValue"
         header-align="center"
         align="center"
-        label="参数值">
+        width="120"
+        label="图像">
+        <template slot-scope="scope">
+          <img :src="scope.row.user.picture" :alt="scope.row.user.picture" class="picture">
+        </template>
       </el-table-column>
       <el-table-column
-        prop="remark"
+        prop="user.postbox"
         header-align="center"
         align="center"
-        label="备注">
+        label="邮箱">
+      </el-table-column>
+      <el-table-column
+        prop="article"
+        header-align="center"
+        align="center"
+        label="文章">
+      </el-table-column>
+      <el-table-column
+        prop="author"
+        header-align="center"
+        align="center"
+        label="作者">
+      </el-table-column>
+      <el-table-column
+        prop="provenance"
+        header-align="center"
+        align="center"
+        label="出处">
+      </el-table-column>
+      <el-table-column
+        prop="hot"
+        header-align="center"
+        align="center"
+        label="推荐">
+      </el-table-column>
+      <el-table-column
+        prop="time"
+        header-align="center"
+        align="center"
+        label="时间">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -74,7 +106,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './config-add-or-update'
+  import AddOrUpdate from './shanchu-update'
   export default {
     data () {
       return {
@@ -100,18 +132,14 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$http({
-          url: this.$http.adornUrl('/sys/config/list'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'paramKey': this.dataForm.paramKey
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
+        this.$http.getStaticDelete(this.pageIndex, this.pageSize).then(res => {
+          if (res.code === 200) {
+            res.data.data.forEach(item=> {
+              if(item.article.length > 80)
+              item.article = item.article.substring(0, 80) + '......'
+            })
+            this.dataList = res.data.data
+            this.totalPage = res.num
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -151,12 +179,8 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/sys/config/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({data}) => {
-            if (data && data.code === 0) {
+          this.$http.deleteStaticDelete(ids).then(res => {
+            if (res.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
@@ -165,8 +189,9 @@
                   this.getDataList()
                 }
               })
+              this.$http.setLog(`删除了id=${ids}的前端软删除文章`, 'admin/System/deleteHandle')
             } else {
-              this.$message.error(data.msg)
+              this.$message.error('操作失败')
             }
           })
         }).catch(() => {})
@@ -174,3 +199,11 @@
     }
   }
 </script>
+
+<style lang="less" scoped>
+.picture {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+}
+</style>

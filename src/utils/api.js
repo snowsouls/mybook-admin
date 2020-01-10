@@ -305,6 +305,129 @@ const getLog = (page, count=10) => new Promise((resolve, reject) => {
     })
 })
 
+/**
+ *  获取前端删除的文章
+ * count     {number}     每页数量
+ * page     {number}     第几页
+ */
+const getStaticDelete = (page, count=10) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/getStaticDelete', {
+        page,
+        count
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  删除前端软删除的文章
+ * id     {array}     文章id
+ */
+const deleteStaticDelete = (id) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/deleteStaticDelete', {
+        id
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  获取某一个软删除的文章（修改它、占有它）
+ * id     {number}     文章id
+ */
+const getOneDelete = (id) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/getOneDelete', {
+        id
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  更新某一个软删除的文章（修改它、占有它，无耻）
+ * id     {number}     文章id
+ * userId     {number}     用户id
+ * article     {string}     文章
+ * time     {datetime}     重定义文章发表时间
+ * author     {string}     文章作者
+ * provenance     {string}     文章出处
+ */
+const updateStaticDelete = (obj) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/updateStaticDelete', obj).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  获取前端的举报反馈
+ * count     {number}     每页数量
+ * page     {number}     第几页
+ */
+const getReport = (page, count=10) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/getReport', {
+        page,
+        count
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  获取传递的id是否有前端文章（举报）
+ * articleId     {number}     文章id
+ */
+const ishHaveDetail = (articleId) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/ishHaveDetail', {
+        articleId
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  获取前端的举报反馈的文章详情
+ * articleId     {number}     文章id
+ * count     {number}     每页数量
+ * page     {number}     第几页
+ */
+const getDetail = (articleId, page, count=10) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/getDetail', {
+        articleId,
+        page,
+        count
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  删除前端举报反馈的文章或评论
+ * articleId     {number}     文章id
+ * commentId     {number}     评论id
+ * replyId     {number}       回复id
+ */
+const deleteArticleOrcommen = (obj) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/deleteArticleOrcommen', obj).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
 
 export default {
     login,
@@ -324,5 +447,13 @@ export default {
     updateRoleStatus,
     addStaticUser,
     deleteStaticUser,
-    getLog
+    getLog,
+    getStaticDelete,
+    deleteStaticDelete,
+    getOneDelete,
+    updateStaticDelete,
+    getReport,
+    ishHaveDetail,
+    getDetail,
+    deleteArticleOrcommen
 }

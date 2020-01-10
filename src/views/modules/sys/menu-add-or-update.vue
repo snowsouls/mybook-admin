@@ -254,7 +254,7 @@
   }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
   .mod-menu {
     .menu-list__input,
     .icon-list__input {
