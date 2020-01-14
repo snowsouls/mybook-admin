@@ -42,7 +42,7 @@
         width="120"
         label="图像">
         <template slot-scope="scope">
-          <img :src="scope.row.picture" :alt="scope.row.picture" class="picture">
+          <img :src="$config.imagesUrl + scope.row.picture" alt="图像" class="picture">
         </template>
       </el-table-column>
       <el-table-column

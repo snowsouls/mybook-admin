@@ -40,7 +40,7 @@
         width="120"
         label="图像">
         <template slot-scope="scope">
-          <img :src="scope.row.user.picture" :alt="scope.row.user.picture" class="picture">
+          <img :src="$config.imagesUrl + scope.row.user.picture" alt="图像" class="picture">
         </template>
       </el-table-column>
       <el-table-column
@@ -92,7 +92,7 @@
         width="150"
         label="核实后操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('oss:report:update')" type="text" size="small" @click="solveHandle(scope.row.id)">解决或优化了</el-button>
+          <el-button v-if="isAuth('oss:report:update')" type="text" size="small" @click="solveHandle(scope.row)">解决或优化了</el-button>
           <el-button v-if="isAuth('oss:report:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">举报人扯犊子</el-button>
         </template>
       </el-table-column>
@@ -112,6 +112,7 @@
 </template>
 
 <script>
+  import { Ajax } from '@/utils/validate'
   import AddOrUpdate from './report-detail'
   export default {
     data () {
@@ -184,8 +185,38 @@
         }
       },
       // 解决或者优化
-      solveHandle() {
-
+      solveHandle(obj) {
+        this.$confirm(`您确定对[id=${obj.id}的文章的举报/、反馈进行核实处理了?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(()=> {
+          if(obj.phone) {
+            Ajax().request('http://192.168.15.34:8888/postReport', {
+              method: 'POST',
+              data: {
+                id: obj.article_id,
+                email: obj.phone,
+                time: obj.time
+              }
+            })
+          }
+          this.$http.deleteStaticReport([obj.id]).then(res => {
+            if (res.code === 200) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+              this.$http.setLog(`处理了id=${obj.id}的前端举报信息`, 'admin/System/deleteStaticReport')
+            } else {
+              this.$message.error('操作失败')
+            }
+          })
+        }).catch(() => {})
       },
       // 删除
       deleteHandle (id) {
@@ -197,7 +228,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http.deleteStaticDelete(ids).then(res => {
+          this.$http.deleteStaticReport(ids).then(res => {
             if (res.code === 200) {
               this.$message({
                 message: '操作成功',
@@ -207,7 +238,7 @@
                   this.getDataList()
                 }
               })
-              this.$http.setLog(`删除了id=${ids}的前端软删除文章`, 'admin/System/deleteHandle')
+              this.$http.setLog(`删除了id=${ids}的前端举报信息`, 'admin/System/deleteStaticReport')
             } else {
               this.$message.error('操作失败')
             }

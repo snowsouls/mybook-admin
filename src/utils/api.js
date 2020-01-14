@@ -428,6 +428,34 @@ const deleteArticleOrcommen = (obj) => new Promise((resolve, reject) => {
     })
 })
 
+/**
+ *  删除前端举报的信息
+ * id     {array}     文章id
+ */
+const deleteStaticReport = (id) => new Promise((resolve, reject) => {
+    axios.post(config.serverUrl + '/admin/System/deleteStaticReport', {
+        id
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
+
+/**
+ *  举报、反馈后的邮件发送
+ * id     {array}     文章id
+ */
+const emailReport = (email, time) => new Promise((resolve, reject) => {
+    axios.post('http://192.168.15.34:8888/postReport', {
+        email,
+        time
+    }).then(res => {
+        resolve(res)
+    }).catch(err => {
+        reject(err)
+    })
+})
 
 export default {
     login,
@@ -455,5 +483,7 @@ export default {
     getReport,
     ishHaveDetail,
     getDetail,
-    deleteArticleOrcommen
+    deleteArticleOrcommen,
+    deleteStaticReport,
+    emailReport
 }

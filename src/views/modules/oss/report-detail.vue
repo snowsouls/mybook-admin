@@ -140,25 +140,35 @@
       },
       deleteArticle(type, id, index, key) {
         let msg = type === 3 ? '回复' : (type === 2 ? '评论' : '文章')
-        this.$confirm(`确定对此${msg}]进行[删除]操作?`, '提示', {
+        this.$confirm(`确定对此'${msg}'进行[删除]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           let obj = {}
-          if(type === 3) obj['replyId'] = id
-          if(type === 2) obj['commentId'] = id
-          if(type === 1) obj['articleId'] = this.id
+          if(type === 1) { obj['articleId'] = this.id, obj['id'] = this.id, obj['text'] = '文章'}
+          if(type === 2) { obj['commentId'] = id, obj['id'] = id, obj['text'] = '评论'}
+          if(type === 3) { obj['replyId'] = id, obj['id'] = id, obj['text'] = '回复'}
           this.$http.deleteArticleOrcommen(obj).then(res => {
             if (res.code === 200) {
-              console.log('删除成功')
+              if(type === 1) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              }
               if(type === 2) {
                 this.comments.splice(index, 1)
               }
               if(type === 3) {
                 this.comments[index]['replys'].splice(key, 1)
               }
-              // this.$http.setLog(`删除了id=${id}的${handleName}`, 'admin/System/deleteMenu')
+              this.$http.setLog(`删除了id=${obj.id}的${obj.text}`, 'admin/System/deleteArticleOrcommen')
             }
           })
         }).catch(() => {})
